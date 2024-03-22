@@ -1,5 +1,5 @@
-import hex_to_rgb
-import rgb_to_hsl_hsp
+from conversion_modules import hex_to_rgb
+from conversion_modules import rgb_to_hsl_hsp
 
 base_color_hex = input('Color (hex): ')
 

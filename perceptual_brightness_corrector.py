@@ -1,8 +1,8 @@
-import hex_to_rgb
-import rgb_to_hsl_hsp
-import hsp_to_hsl
-import hsl_to_rgb
-import rgb_to_hex
+from conversion_modules import hex_to_rgb
+from conversion_modules import rgb_to_hsl_hsp
+from conversion_modules import hsp_to_hsl
+from conversion_modules import hsl_to_rgb
+from conversion_modules import rgb_to_hex
 
 base_color_hex = input('Base color (hex): ')
 
