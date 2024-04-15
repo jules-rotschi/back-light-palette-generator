@@ -1,66 +1,73 @@
 from config.shades_of_gray import shades_of_gray
-from config.shades_of_gray import white
-from config.shades_of_gray import black
-
-from modules.conversion.hex_to_rgb import hex_to_rgb
-from modules.conversion.rgb_to_hex import rgb_to_hex
 
 from modules.set_brightness import set_brightness
+from modules.get_brightness import get_brightness
 
-class Color_shades:
-  def __init__(self, base, opacity, blend_brightness):
-    self.base = base
-    self.opacity = opacity
-    self.blend_color = blend_brightness * 2.55
+def get_deltas(base_color_brightness):
 
-  def getChannel(self, channel):
-    return self.opacity * self.base[channel] + (1 - self.opacity) * self.blend_color
+  deltas = []
 
-  def getRGB(self):
-    return self.getChannel(0), self.getChannel(1), self.getChannel(2)
+  for shade in shades_of_gray:
+    delta = abs(shade - base_color_brightness)
+    deltas.append(delta)
 
-  def getHex(self):
-    return rgb_to_hex(self.getRGB())
+  return tuple(deltas)
 
 
-def get_colors(base_color_hex):
+def get_nearest_gray_index(base_color_brightness):
+    
+  light_grays_deltas = (get_deltas(base_color_brightness)[::-1])[4::]
+  dark_grays_deltas = get_deltas(base_color_brightness)[4::]
 
-  color_rgb = hex_to_rgb(base_color_hex)
+  nearest_gray_delta = min(min(light_grays_deltas), min(dark_grays_deltas))
+
+  if (nearest_gray_delta in light_grays_deltas) and (nearest_gray_delta in dark_grays_deltas):
+    return 4
+  
+  if (nearest_gray_delta in light_grays_deltas):
+    index = light_grays_deltas.index((min(light_grays_deltas)))
+    return -index + 4
+
+  if (nearest_gray_delta in dark_grays_deltas):
+    index = dark_grays_deltas.index((min(dark_grays_deltas)))
+    return index + 4
+    
+
+def get_colors_with_base(base_color_hex):
+
+  base_color_brightness = get_brightness(base_color_hex)
 
   colors = []
-
-  color_100 = Color_shades(color_rgb, 0.2, white)
-  color_200 = Color_shades(color_rgb, 0.4, white)
-  color_300 = Color_shades(color_rgb, 0.6, white)
-  color_400 = Color_shades(color_rgb, 0.8, white)
-  color_500 = Color_shades(color_rgb, 1, black)
-  color_600 = Color_shades(color_rgb, 0.8, black)
-  color_700 = Color_shades(color_rgb, 0.6, black)
-  color_800 = Color_shades(color_rgb, 0.4, black)
-  color_900 = Color_shades(color_rgb, 0.2, black)
-
-  shades = (
-    color_100,
-    color_200,
-    color_300,
-    color_400,
-    color_500,
-    color_600,
-    color_700,
-    color_800,
-    color_900
-  )
-
-  for shade in shades:
-    colors.append(shade.getHex())
+  
+  for shade in shades_of_gray:
+    if shades_of_gray.index(shade) == get_nearest_gray_index(base_color_brightness):
+      colors.append(base_color_hex)
+    else:
+      new_color_hex = set_brightness(base_color_hex, shade)
+      colors.append(new_color_hex)
 
   return tuple(colors)
 
-def generate_palette(base_color_hex):
+
+def get_colors_without_base(base_color_hex):
+
+  colors = []
+  
+  for shade in shades_of_gray:
+      new_color_hex = set_brightness(base_color_hex, shade)
+      colors.append(new_color_hex)
+
+  return tuple(colors)
+
+
+def generate_palette(base_color_hex, use_base_color) :
 
   if base_color_hex[0] == '#':
     base_color_hex = base_color_hex[1::]
 
-  palette = get_colors(base_color_hex)
+  if use_base_color:
+    palette = get_colors_with_base(base_color_hex)
+  else:
+    palette = get_colors_without_base(base_color_hex)
 
   return palette
