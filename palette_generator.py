@@ -8,9 +8,9 @@ from modules.set_brightness import set_brightness
 from modules.get_opacities import get_opacities
 
 base_color_hex = input('Base color (hex): ')
-use_base_color = input('Use base color in palette ? (y/enter) ')
+use_base_color = input('Enter \'y\' if yo want to activate strict color mode (else, press enter)')
 
-if use_base_color == 'y':
+if use_base_color == 'yes':
   strict_mode = True
 
 if use_base_color == '':
